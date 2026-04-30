@@ -1,0 +1,21 @@
+# 抖音电商数据分析平台依赖
+
+# 数据处理
+pandas>=1.5.0
+numpy>=1.24.0
+openpyxl>=3.1.0
+
+# 可视化
+plotly>=5.15.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Web框架
+dash>=2.14.0
+dash-bootstrap-components>=1.5.0
+streamlit>=1.28.0
+
+# 其他工具
+python-dateutil>=2.8.0
+pyyaml>=6.0.1
+requests>=2.31.0

@@ -1,0 +1,128 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --douyin-primary: #FE2C55;
+  --douyin-secondary: #25F4EE;
+  --douyin-dark: #000000;
+  --douyin-dark-gray: #161823;
+  --douyin-light-gray: #1F1F1F;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  background-color: var(--douyin-dark);
+  color: #ffffff;
+  line-height: 1.6;
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--douyin-dark-gray);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--douyin-primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ff4769;
+}
+
+/* 霓虹发光效果 */
+.neon-glow {
+  box-shadow: 0 0 10px rgba(254, 44, 85, 0.5),
+              0 0 20px rgba(254, 44, 85, 0.3),
+              0 0 30px rgba(254, 44, 85, 0.1);
+}
+
+.neon-text {
+  text-shadow: 0 0 10px rgba(254, 44, 85, 0.8),
+               0 0 20px rgba(254, 44, 85, 0.5);
+}
+
+.neon-border {
+  border: 1px solid rgba(254, 44, 85, 0.5);
+  box-shadow: 0 0 10px rgba(254, 44, 85, 0.3);
+}
+
+/* 卡片样式 */
+.douyin-card {
+  background: linear-gradient(135deg, var(--douyin-dark-gray) 0%, var(--douyin-light-gray) 100%);
+  border: 1px solid rgba(254, 44, 85, 0.2);
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.douyin-card:hover {
+  border-color: rgba(254, 44, 85, 0.5);
+  box-shadow: 0 4px 20px rgba(254, 44, 85, 0.2);
+}
+
+/* 按钮样式 */
+.douyin-btn {
+  background: linear-gradient(135deg, var(--douyin-primary) 0%, #ff4769 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  padding: 12px 24px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.douyin-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(254, 44, 85, 0.4);
+}
+
+/* 渐变文字 */
+.gradient-text {
+  background: linear-gradient(135deg, var(--douyin-primary) 0%, var(--douyin-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* 动画 */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.5s ease-out;
+}
