@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusTik 数据分析平台 - 抖音电商智能分析系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 60px 20px;
+            color: white;
+        }
+
+        header h1 {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 1.3em;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+
+        .badges {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 30px;
+        }
+
+        .badge {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-primary {
+            display: inline-block;
+            background: #ff6b6b;
+            color: white;
+            padding: 15px 40px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255,107,107,0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255,107,107,0.6);
+        }
+
+        .features {
+            background: white;
+            border-radius: 20px;
+            padding: 60px 40px;
+            margin: 40px 0;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 50px;
+            color: #2d3748;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+
+        .feature-card {
+            background: #f7fafc;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: #667eea;
+            box-shadow: 0 10px 30px rgba(102,126,234,0.2);
+        }
+
+        .feature-icon {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            color: #2d3748;
+        }
+
+        .feature-card p {
+            color: #718096;
+            line-height: 1.8;
+        }
+
+        .modules {
+            background: white;
+            border-radius: 20px;
+            padding: 60px 40px;
+            margin: 40px 0;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .modules h2 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 50px;
+            color: #2d3748;
+        }
+
+        .module-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .module-item {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            transition: all 0.3s ease;
+        }
+
+        .module-item:hover {
+            transform: scale(1.02);
+            box-shadow: 0 15px 40px rgba(102,126,234,0.3);
+        }
+
+        .module-item h3 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+        }
+
+        .module-item ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .module-item li {
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .module-item li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        .tech-stack {
+            background: white;
+            border-radius: 20px;
+            padding: 60px 40px;
+            margin: 40px 0;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .tech-stack h2 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 50px;
+            color: #2d3748;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .tech-item {
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            font-weight: 600;
+            color: #4a5568;
+            transition: all 0.3s ease;
+        }
+
+        .tech-item:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .quick-start {
+            background: white;
+            border-radius: 20px;
+            padding: 60px 40px;
+            margin: 40px 0;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        .quick-start h2 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 50px;
+            color: #2d3748;
+        }
+
+        .code-block {
+            background: #2d3748;
+            color: #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            overflow-x: auto;
+        }
+
+        .code-block code {
+            font-family: 'Courier New', monospace;
+            line-height: 1.6;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            color: white;
+            opacity: 0.8;
+        }
+
+        .github-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            margin-top: 20px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .github-link:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2.5em;
+            }
+
+            .features, .modules, .tech-stack, .quick-start {
+                padding: 40px 20px;
+            }
+
+            .feature-grid, .module-list, .tech-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>NexusTik 数据分析平台</h1>
+            <p>抖音电商智能分析系统 - 整合销售、客户、抖音三大分析模块</p>
+            <div class="badges">
+                <span class="badge">Python 3.8+</span>
+                <span class="badge">Streamlit</span>
+                <span class="badge">Plotly</span>
+                <span class="badge">React</span>
+                <span class="badge">MIT License</span>
+            </div>
+            <a href="#quick-start" class="btn-primary">快速开始</a>
+        </header>
+
+        <section class="features">
+            <h2>核心功能</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>销售分析</h3>
+                    <p>销售趋势追踪、类目分布分析、渠道效果评估，6大核心KPI指标实时监控</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">👥</div>
+                    <h3>客户分析</h3>
+                    <p>RFM客户分群、留存分析、客户价值评估，精准识别高价值客户</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>抖音分析</h3>
+                    <p>视频数据分析、直播效果追踪、互动率统计，全面掌握抖音电商表现</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3>多语言支持</h3>
+                    <p>中文/English 一键切换，满足不同语言环境需求</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3>主题切换</h3>
+                    <p>活力、海洋、日落三种配色主题，个性化数据可视化体验</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📁</div>
+                    <h3>CSV导入</h3>
+                    <p>支持上传自定义CSV数据，自动适配中文列名，灵活分析自有数据</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="modules">
+            <h2>分析模块</h2>
+            <div class="module-list">
+                <div class="module-item">
+                    <h3>📊 销售分析模块</h3>
+                    <ul>
+                        <li>销售趋势折线图（月度/季度）</li>
+                        <li>类目分布柱状图</li>
+                        <li>渠道占比饼图</li>
+                        <li>6大KPI指标卡片</li>
+                        <li>多维度数据筛选</li>
+                        <li>CSV数据导入支持</li>
+                    </ul>
+                </div>
+                <div class="module-item">
+                    <h3>👥 客户分析模块</h3>
+                    <ul>
+                        <li>RFM客户分群分析</li>
+                        <li>留存分析热力图</li>
+                        <li>客户价值评估</li>
+                        <li>新客户/活跃/高价值分布</li>
+                        <li>城市/类目筛选</li>
+                        <li>CSV数据导入支持</li>
+                    </ul>
+                </div>
+                <div class="module-item">
+                    <h3>📱 抖音分析模块</h3>
+                    <ul>
+                        <li>视频数据趋势图</li>
+                        <li>直播效果散点图</li>
+                        <li>播放量/点赞/评论统计</li>
+                        <li>互动率分析</li>
+                        <li>GMV/转化率追踪</li>
+                        <li>视频/直播KPI对比</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section class="tech-stack">
+            <h2>技术栈</h2>
+            <div class="tech-grid">
+                <div class="tech-item">Python</div>
+                <div class="tech-item">Pandas</div>
+                <div class="tech-item">NumPy</div>
+                <div class="tech-item">Streamlit</div>
+                <div class="tech-item">Dash</div>
+                <div class="tech-item">React</div>
+                <div class="tech-item">Plotly</div>
+                <div class="tech-item">Tailwind CSS</div>
+            </div>
+        </section>
+
+        <section class="quick-start" id="quick-start">
+            <h2>快速开始</h2>
+            
+            <h3>1. 安装依赖</h3>
+            <div class="code-block">
+                <code>
+git clone https://github.com/yourusername/nexustik-analytics.git<br>
+cd nexustik-analytics<br>
+pip install -r requirements.txt
+                </code>
+            </div>
+
+            <h3>2. 启动统一分析平台</h3>
+            <div class="code-block">
+                <code>
+cd nexus-platform<br>
+streamlit run app.py<br>
+# 访问 http://localhost:8501
+                </code>
+            </div>
+
+            <h3>3. 启动销售智能看板</h3>
+            <div class="code-block">
+                <code>
+cd sales-intelligence-dashboard<br>
+python app.py<br>
+# 访问 http://localhost:8050
+                </code>
+            </div>
+
+            <h3>4. 启动客户分析看板</h3>
+            <div class="code-block">
+                <code>
+cd customer-analytics-dashboard<br>
+streamlit run app.py<br>
+# 访问 http://localhost:8502
+                </code>
+            </div>
+
+            <h3>5. 启动抖音视频看板</h3>
+            <div class="code-block">
+                <code>
+cd douyin-video-dashboard<br>
+npm install<br>
+npm run dev<br>
+# 访问 http://localhost:5173
+                </code>
+            </div>
+        </section>
+
+        <footer>
+            <p>Made with ❤️ for Douyin E-commerce Analytics</p>
+            <a href="https://github.com/yourusername/nexustik-analytics" class="github-link">
+                <svg height="20" viewBox="0 0 16 16" width="20" fill="white">
+                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+                </svg>
+                GitHub 仓库
+            </a>
+        </footer>
+    </div>
+</body>
+</html>

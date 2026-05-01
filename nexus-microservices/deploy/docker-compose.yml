@@ -1,0 +1,148 @@
+version: '3.8'
+
+services:
+  # API Gateway
+  api-gateway:
+    build:
+      context: ../api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - SALES_SERVICE_URL=http://sales-service:8001
+      - CUSTOMER_SERVICE_URL=http://customer-service:8002
+      - TIKTOK_SERVICE_URL=http://tiktok-service:8003
+      - JWT_SECRET=nexustik-secret-key
+    depends_on:
+      - sales-service
+      - customer-service
+      - tiktok-service
+    networks:
+      - nexus-network
+    restart: unless-stopped
+
+  # 销售分析服务
+  sales-service:
+    build:
+      context: ../sales-service
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/sales_db
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - nexus-network
+    restart: unless-stopped
+    volumes:
+      - sales-data:/app/data
+
+  # 客户分析服务
+  customer-service:
+    build:
+      context: ../customer-service
+      dockerfile: Dockerfile
+    ports:
+      - "8002:8002"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/customer_db
+      - REDIS_URL=redis://redis:6379/1
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - nexus-network
+    restart: unless-stopped
+    volumes:
+      - customer-data:/app/data
+
+  # TikTok分析服务
+  tiktok-service:
+    build:
+      context: ../tiktok-service
+      dockerfile: Dockerfile
+    ports:
+      - "8003:8003"
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/tiktok_db
+      - REDIS_URL=redis://redis:6379/2
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - nexus-network
+    restart: unless-stopped
+    volumes:
+      - tiktok-data:/app/data
+
+  # 前端应用
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8080
+    depends_on:
+      - api-gateway
+    networks:
+      - nexus-network
+    restart: unless-stopped
+
+  # PostgreSQL数据库
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=nexustik
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - nexus-network
+    restart: unless-stopped
+
+  # Redis缓存
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - nexus-network
+    restart: unless-stopped
+
+  # Nginx反向代理
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl
+    depends_on:
+      - api-gateway
+      - frontend
+    networks:
+      - nexus-network
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+  redis-data:
+  sales-data:
+  customer-data:
+  tiktok-data:
+
+networks:
+  nexus-network:
+    driver: bridge

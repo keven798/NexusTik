@@ -1,263 +1,257 @@
-# 抖音电商数据分析平台
+# NexusTik 数据分析平台
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Python-3.8+-blue.svg" alt="Python 3.8+">
-  <img src="https://img.shields.io/badge/React-18+-61DAFB.svg" alt="React 18+">
-  <img src="https://img.shields.io/badge/Streamlit-1.28+-FF4B4B.svg" alt="Streamlit">
-  <img src="https://img.shields.io/badge/Power%20BI-Desktop-yellow.svg" alt="Power BI">
-  <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT License">
+  <img src="https://img.shields.io/badge/Python-3.8+-blue.svg" alt="Python">
+  <img src="https://img.shields.io/badge/Streamlit-1.28+-red.svg" alt="Streamlit">
+  <img src="https://img.shields.io/badge/Plotly-5.18+-green.svg" alt="Plotly">
+  <img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License">
 </p>
 
 <p align="center">
-  <b>一站式抖音电商数据分析解决方案</b><br>
-  整合销售智能分析、短视频数据看板、客户细分与留存分析的完整平台
+  <b>抖音电商智能分析系统</b> - 整合销售分析、客户分析、抖音分析三大模块的统一数据分析平台
 </p>
 
 ---
 
-## ✨ 项目概述
+## 功能特性
 
-本项目整合了三个优秀的开源电商数据分析项目，为抖音电商商家提供全方位的数据分析能力：
+### 核心模块
 
-1. **销售智能分析** - 基于 Python + Plotly/Dash 的销售数据分析
-2. **抖音短视频看板** - React + ECharts 的短视频/直播数据可视化
-3. **客户分析** - Streamlit + Plotly 的客户细分与留存分析
+| 模块 | 功能描述 | 关键指标 |
+|------|---------|---------|
+| **销售分析** | 销售趋势、类目分布、渠道分析 | 总销售额、总利润、总订单、总客户、客单价、利润率 |
+| **客户分析** | RFM客户分群、留存分析、客户价值评估 | 新客户/活跃客户/高价值客户分布 |
+| **抖音分析** | 视频数据分析、直播数据分析 | 播放量、点赞、评论、互动率、GMV、转化率 |
 
----
+### 特色功能
 
-## 🎯 核心功能
-
-### 📊 销售智能分析 (sales-intelligence-dashboard)
-- **实时销售看板**: 总销售额、订单数、客单价 KPI
-- **产品性能分析**: 热销商品、品类分析、库存预警
-- **收入优化**: 销售趋势预测、定价策略建议
-- **自动化管道**: 数据自动采集、清洗、分析
-
-### 🎬 抖音短视频看板 (douyin-video-dashboard)
-- **视频数据分析**: 播放量、点赞、评论、转发统计
-- **直播数据分析**: 直播时长、观看人数、GMV、转化率
-- **内容ROI分析**: 投入产出比、内容效果评估
-- **抖音风格UI**: 黑色主题 + 霓虹效果
-
-### 👥 客户分析 (customer-analytics-dashboard)
-- **RFM客户细分**: 价值客户识别、分层运营
-- **留存分析**: 客户生命周期、复购率分析
-- **地理分析**: 区域销售分布、热力图
-- **预测模型**: 客户流失预警、LTV预测
+- **多语言支持**：中文 / English 一键切换
+- **主题切换**：活力、海洋、日落三种配色主题
+- **CSV数据导入**：支持上传自定义数据进行分析
+- **实时筛选**：日期范围、类目、渠道、城市等多维度筛选
+- **交互式图表**：Plotly 交互式图表，支持缩放、平移、下载
 
 ---
 
-## 🛠️ 技术架构
+## 项目结构
 
 ```
-抖音电商数据分析平台
-├── 📁 sales-intelligence-dashboard/     # 销售智能分析
-│   ├── python/                          # Python数据处理
-│   ├── powerbi/                         # Power BI报表
-│   └── data/                            # 销售数据
-├── 📁 douyin-video-dashboard/           # 抖音短视频看板
-│   ├── src/                             # React源代码
-│   ├── public/                          # 静态资源
-│   └── package.json                     # 依赖配置
-├── 📁 customer-analytics-dashboard/     # 客户分析
-│   ├── app.py                           # Streamlit主应用
-│   ├── utils/                           # 工具函数
-│   └── data/                            # 客户数据
-├── 📁 data/                             # 统一数据目录
-│   ├── raw/                             # 原始数据
-│   ├── processed/                       # 处理后数据
-│   └── sample/                          # 示例数据
-├── 📁 docs/                             # 文档
-│   ├── 安装指南.md
-│   ├── 使用手册.md
-│   └── API文档.md
-└── 📁 scripts/                          # 脚本工具
-    ├── setup.py                         # 环境安装
-    ├── start_all.py                     # 一键启动
-    └── data_sync.py                     # 数据同步
+nexustik-analytics/
+├── nexus-platform/              # 统一分析平台（主入口）
+│   └── app.py                   # Streamlit 主应用
+├── sales-intelligence-dashboard/ # 销售智能分析看板
+│   └── app.py                   # Dash 销售分析
+├── customer-analytics-dashboard/ # 客户分析看板
+│   └── app.py                   # Streamlit 客户分析
+├── douyin-video-dashboard/       # 抖音视频分析看板
+│   ├── src/
+│   │   ├── App.jsx              # React 主组件
+│   │   └── utils/mockData.js    # 模拟数据
+│   ├── index.html
+│   ├── package.json
+│   └── vite.config.js
+├── nexus-microservices/          # 微服务架构
+│   ├── api-gateway/
+│   └── deploy/
+├── scripts/                      # 启动脚本
+│   ├── setup.py
+│   └── start_all.py
+├── requirements.txt              # Python 依赖
+└── README.md                     # 项目说明
 ```
 
 ---
 
-## 📦 安装部署
+## 快速开始
 
 ### 环境要求
+
 - Python 3.8+
-- Node.js 16+
-- npm 或 yarn
-- Git
+- Node.js 16+ (如需运行 React 看板)
 
-### 快速开始
+### 安装依赖
 
-#### 1. 克隆仓库
 ```bash
-git clone https://github.com/yourusername/抖音电商数据分析.git
-cd 抖音电商数据分析
-```
+# 克隆项目
+git clone https://github.com/yourusername/nexustik-analytics.git
+cd nexustik-analytics
 
-#### 2. 安装依赖
-```bash
-# 运行安装脚本
-python scripts/setup.py
-```
-
-或手动安装：
-```bash
-# Python依赖
+# 安装 Python 依赖
 pip install -r requirements.txt
-
-# 抖音看板依赖
-cd douyin-video-dashboard
-npm install
 ```
 
-#### 3. 启动服务
+### 启动统一分析平台
+
 ```bash
-# 一键启动所有服务
-python scripts/start_all.py
+cd nexus-platform
+streamlit run app.py
 ```
 
-或单独启动：
+访问地址：http://localhost:8501
+
+### 启动销售智能看板
+
 ```bash
-# 启动销售分析 (端口:8050)
 cd sales-intelligence-dashboard
 python app.py
+```
 
-# 启动抖音看板 (端口:3000)
-cd douyin-video-dashboard
-npm start
+访问地址：http://localhost:8050
 
-# 启动客户分析 (端口:8501)
+### 启动客户分析看板
+
+```bash
 cd customer-analytics-dashboard
 streamlit run app.py
 ```
 
----
+访问地址：http://localhost:8502
 
-## 📊 数据源配置
+### 启动抖音视频看板
 
-### 抖音电商罗盘数据
-1. 登录抖音电商罗盘
-2. 导出直播数据、短视频数据、商品数据
-3. 将CSV文件放入 `data/raw/` 目录
-
-### 店铺后台数据
-1. 从抖店后台导出订单数据
-2. 放入 `data/raw/orders/` 目录
-
-### 数据格式示例
-
-#### 订单数据
-```csv
-order_id,product_name,amount,quantity,order_date,customer_id
-ORD001,商品A,199.00,2,2024-01-15,CUST001
-ORD002,商品B,299.00,1,2024-01-16,CUST002
+```bash
+cd douyin-video-dashboard
+npm install
+npm run dev
 ```
 
-#### 视频数据
-```csv
-video_id,title,play_count,like_count,comment_count,share_date
-VID001,视频标题A,125000,8500,320,2024-01-15
-VID002,视频标题B,98000,6200,280,2024-01-16
-```
+访问地址：http://localhost:5173
 
 ---
 
-## 🎨 界面预览
+## 数据格式
 
-### 销售智能看板
-- 实时KPI指标卡片
+### 销售数据 CSV 格式
+
+| 列名 | 说明 | 示例 |
+|------|------|------|
+| 订单日期 | 订单创建日期 | 2024-01-15 |
+| 订单金额 | 订单总金额 | 299.00 |
+| 订单成本 | 商品成本 | 150.00 |
+| 商品数量 | 购买数量 | 2 |
+| 商品类目 | 商品分类 | 服装 |
+| 商品名称 | 商品名称 | T恤 |
+| 客户ID | 客户标识 | CUST001 |
+| 城市 | 客户所在城市 | 上海 |
+| 渠道 | 销售渠道 | 抖音直播 |
+
+### 客户数据 CSV 格式
+
+| 列名 | 说明 | 示例 |
+|------|------|------|
+| 订单日期 | 订单创建日期 | 2024-01-15 |
+| 客户ID | 客户标识 | CUST001 |
+| 订单金额 | 订单金额 | 299.00 |
+| 订单成本 | 商品成本 | 150.00 |
+| 城市 | 客户所在城市 | 上海 |
+| 渠道 | 销售渠道 | 抖音直播 |
+| 商品类目 | 商品分类 | 服装 |
+| 订单ID | 订单标识 | ORD001 |
+
+---
+
+## 核心算法
+
+### RFM 客户分群
+
+- **R (Recency)**：最近一次购买距今天数
+- **F (Frequency)**：购买频率
+- **M (Monetary)**：消费金额
+
+客户分群结果：
+- 新客户/冷淡客户
+- 活跃客户
+- 高价值客户
+
+### 留存分析
+
+基于客户首次购买月份进行同期群分析，计算各月份的留存率。
+
+---
+
+## 技术栈
+
+### 后端
+- **Python** - 核心编程语言
+- **Pandas** - 数据处理与分析
+- **NumPy** - 数值计算
+
+### 前端
+- **Streamlit** - Python 数据应用框架
+- **Dash** - Plotly 数据可视化框架
+- **React** - 用户界面库
+- **Tailwind CSS** - 样式框架
+
+### 可视化
+- **Plotly** - 交互式图表
+- **Plotly Express** - 高级图表接口
+
+---
+
+## 截图展示
+
+### 销售分析页面
+- 顶部渐变导航栏
+- 6个彩色KPI指标卡片
 - 销售趋势折线图
-- 产品类别饼图
-- 区域销售热力图
+- 类目分布柱状图
+- 渠道占比饼图
 
-### 抖音短视频看板
-- 视频数据概览
-- 播放/互动趋势图
-- 直播数据大屏
-- 转化率分析
+### 客户分析页面
+- RFM客户分群柱状图
+- 留存分析热力图
+- 客户数据表格
 
-### 客户分析看板
-- RFM客户分层
-- 留存率曲线
-- 客户生命周期价值
-- 地理分布图
+### 抖音分析页面
+- 视频数据趋势图
+- 直播效果散点图
+- 视频/直播KPI指标
 
----
-
-## 🔧 配置说明
-
-### 配置文件
-编辑 `config.yaml` 文件：
-```yaml
-# 数据库配置
-database:
-  type: sqlite
-  path: data/database.db
-
-# API配置
-douyin_api:
-  app_id: your_app_id
-  app_secret: your_app_secret
-
-# 看板配置
-dashboard:
-  sales_port: 8050
-  video_port: 3000
-  customer_port: 8501
-```
+### 设置页面
+- 语言切换（中文/English）
+- 主题切换（活力/海洋/日落）
 
 ---
 
-## 📈 使用流程
+## 开发计划
 
-### 日常数据分析流程
-1. **数据导入**: 将抖音罗盘导出的数据放入指定目录
-2. **数据清洗**: 运行数据清洗脚本
-3. **查看看板**: 打开各个分析看板查看数据
-4. **导出报告**: 生成PDF或Excel分析报告
-
-### 直播数据分析流程
-1. 直播结束后导出直播数据
-2. 上传数据到平台
-3. 查看直播效果分析
-4. 对比历史直播数据
-5. 生成优化建议
+- [x] 销售分析模块
+- [x] 客户分析模块
+- [x] 抖音分析模块
+- [x] 多语言支持
+- [x] 主题切换
+- [x] CSV数据导入
+- [ ] 数据导出功能
+- [ ] 用户认证系统
+- [ ] 实时数据接入
+- [ ] 移动端适配
 
 ---
 
-## 🤝 贡献指南
+## 贡献指南
 
 欢迎提交 Issue 和 Pull Request！
 
-### 提交规范
-- 使用清晰的提交信息
-- 添加必要的测试
-- 更新相关文档
+1. Fork 本仓库
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送分支 (`git push origin feature/AmazingFeature`)
+5. 创建 Pull Request
 
 ---
 
-## 📄 开源协议
+## 许可证
 
-本项目采用 MIT 协议开源。
-
----
-
-## 🙏 致谢
-
-本项目整合了以下优秀的开源项目：
-
-- [Madhav E-Commerce Sales Intelligence Dashboard](https://github.com/amitkr209/Madhav_E-Commerce-Sales_Intelligence_Dashboard)
-- [抖音/TikTok 电商短视频数据分析看板](https://github.com/1xbbx)
-- [Data Storytelling Dashboard](https://github.com/AmirhosseinHonardoust/Data-Storytelling-Dashboard)
-
-感谢这些项目的作者！
+本项目基于 MIT 许可证开源 - 查看 [LICENSE](LICENSE) 文件了解详情
 
 ---
 
-## 📞 联系方式
+## 联系方式
 
-如有问题或建议，请提交 Issue 或联系项目维护者。
+如有问题或建议，欢迎通过以下方式联系：
+
+- 提交 GitHub Issue
+- 发送邮件至：your-email@example.com
 
 ---
 

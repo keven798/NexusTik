@@ -1,0 +1,351 @@
+/* NexusTik 客户分析看板 - 玻璃态设计风格 */
+/* Glassmorphism Design System */
+
+:root {
+  /* 背景渐变色系 - 深邃科技蓝紫 */
+  --bg-gradient-start: #0f0c29;
+  --bg-gradient-mid: #302b63;
+  --bg-gradient-end: #24243e;
+  
+  /* 玻璃卡片色彩 */
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --glass-bg-hover: rgba(255, 255, 255, 0.12);
+  --glass-border: rgba(255, 255, 255, 0.18);
+  --glass-border-hover: rgba(255, 255, 255, 0.3);
+  --glass-shadow: rgba(0, 0, 0, 0.3);
+  --glass-highlight: rgba(255, 255, 255, 0.1);
+  
+  /* 霓虹高光 */
+  --neon-primary: #00d4ff;
+  --neon-secondary: #7b2cbf;
+  --neon-accent: #ff006e;
+  --neon-glow: rgba(0, 212, 255, 0.3);
+  
+  /* 文字色彩 */
+  --text-primary: rgba(255, 255, 255, 0.95);
+  --text-secondary: rgba(255, 255, 255, 0.7);
+  --text-muted: rgba(255, 255, 255, 0.5);
+  
+  /* 间距系统 */
+  --space-xs: 8px;
+  --space-sm: 16px;
+  --space-md: 24px;
+  --space-lg: 32px;
+  --space-xl: 48px;
+  
+  /* 圆角 */
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  
+  /* 过渡动画 */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+}
+
+/* 全局背景 */
+.glass-body {
+  background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+}
+
+/* 玻璃卡片基础样式 */
+.glass-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  box-shadow: 
+    0 8px 32px 0 var(--glass-shadow),
+    inset 0 1px 0 0 var(--glass-highlight);
+  padding: var(--space-md);
+  transition: all var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+/* 玻璃卡片悬停效果 */
+.glass-card:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-hover);
+  box-shadow: 
+    0 12px 48px 0 rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.2),
+    0 0 20px var(--neon-glow);
+  transform: translateY(-2px);
+}
+
+/* 玻璃卡片激活效果 */
+.glass-card:active {
+  transform: scale(0.98);
+  transition: transform var(--transition-fast);
+}
+
+/* 玻璃卡片顶部高光 */
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.3) 50%, 
+    transparent 100%
+  );
+}
+
+/* 玻璃卡片边角高光 */
+.glass-card::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* KPI指标卡片 - 特殊玻璃效果 */
+.glass-kpi {
+  background: linear-gradient(135deg, 
+    rgba(0, 212, 255, 0.1) 0%, 
+    rgba(123, 44, 191, 0.1) 100%
+  );
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  transition: all var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-kpi:hover {
+  border-color: rgba(0, 212, 255, 0.4);
+  box-shadow: 
+    0 0 30px rgba(0, 212, 255, 0.2),
+    inset 0 1px 0 0 rgba(255, 255, 255, 0.2);
+  transform: translateY(-3px);
+}
+
+/* KPI数值霓虹效果 */
+.glass-kpi .kpi-value {
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--neon-primary), var(--neon-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: 0 0 30px var(--neon-glow);
+}
+
+.glass-kpi .kpi-label {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin-top: var(--space-xs);
+}
+
+/* 侧边栏玻璃效果 */
+.glass-sidebar {
+  background: rgba(15, 12, 41, 0.7);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border-right: 1px solid var(--glass-border);
+  padding: var(--space-lg);
+}
+
+/* 按钮玻璃效果 */
+.glass-button {
+  background: linear-gradient(135deg, 
+    rgba(0, 212, 255, 0.2) 0%, 
+    rgba(123, 44, 191, 0.2) 100%
+  );
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  padding: var(--space-sm) var(--space-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-button:hover {
+  background: linear-gradient(135deg, 
+    rgba(0, 212, 255, 0.3) 0%, 
+    rgba(123, 44, 191, 0.3) 100%
+  );
+  border-color: rgba(0, 212, 255, 0.5);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.glass-button:active {
+  transform: scale(0.98);
+}
+
+/* 标题样式 */
+.glass-title {
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--text-primary), var(--neon-primary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: var(--space-md);
+}
+
+.glass-subtitle {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin-bottom: var(--space-lg);
+}
+
+/* 表格玻璃效果 */
+.glass-table {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.glass-table th {
+  background: rgba(0, 212, 255, 0.1);
+  color: var(--neon-primary);
+  font-weight: 600;
+  padding: var(--space-sm);
+  text-align: left;
+  border-bottom: 1px solid var(--glass-border);
+}
+
+.glass-table td {
+  padding: var(--space-sm);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+}
+
+.glass-table tr:hover td {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
+
+/* 图表容器玻璃效果 */
+.glass-chart {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  box-shadow: 
+    0 8px 32px 0 var(--glass-shadow),
+    inset 0 1px 0 0 var(--glass-highlight);
+}
+
+/* 标签页玻璃效果 */
+.glass-tabs {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-xs);
+}
+
+.glass-tab {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.glass-tab:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+.glass-tab.active {
+  background: linear-gradient(135deg, 
+    rgba(0, 212, 255, 0.2) 0%, 
+    rgba(123, 44, 191, 0.2) 100%
+  );
+  color: var(--neon-primary);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+}
+
+/* 分隔线玻璃效果 */
+.glass-divider {
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    var(--glass-border) 50%, 
+    transparent 100%
+  );
+  margin: var(--space-md) 0;
+}
+
+/* 滚动条玻璃效果 */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--neon-primary), var(--neon-secondary));
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--neon-primary), var(--neon-accent));
+}
+
+/* 加载动画 */
+@keyframes glass-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.glass-loading {
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.1) 50%, 
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: glass-shimmer 1.5s infinite;
+}
+
+/* 响应式适配 */
+@media (max-width: 768px) {
+  .glass-card {
+    padding: var(--space-sm);
+  }
+  
+  .glass-kpi .kpi-value {
+    font-size: 1.5rem;
+  }
+  
+  .glass-title {
+    font-size: 1.5rem;
+  }
+}

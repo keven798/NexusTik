@@ -1,389 +1,284 @@
-# 销售智能分析看板
-# 基于 Python + Plotly Dash 的电商销售数据分析平台
+# NexusTik 销售智能分析看板
+# 基于 Madhav Dashboard 核心逻辑，适配抖音电商数据
 
-import dash
-from dash import dcc, html, Input, Output, callback
-import dash_bootstrap_components as dbc
-import plotly.express as px
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 import pandas as pd
 import numpy as np
-from datetime import datetime, timedelta
+import plotly.express as px
+import plotly.graph_objects as go
+from dash import Dash, html, dcc, Input, Output
+import io
+import base64
+import matplotlib.pyplot as plt
+import seaborn as sns
 import warnings
-warnings.filterwarnings('ignore')
+warnings.filterwarnings("ignore", category=FutureWarning)
+warnings.filterwarnings("ignore", category=DeprecationWarning)
+warnings.filterwarnings("ignore", category=UserWarning)
 
-# 初始化 Dash 应用
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
-app.title = "抖音电商销售智能分析"
-
-# 生成示例数据
-def generate_sample_data():
-    """生成示例销售数据"""
-    np.random.seed(42)
-    
-    # 日期范围
-    dates = pd.date_range(start='2024-01-01', end='2024-12-31', freq='D')
-    
-    # 商品类别
-    categories = ['服装', '美妆', '数码', '家居', '食品', '配饰']
-    
-    # 生成订单数据
-    data = []
-    for date in dates:
-        daily_orders = np.random.randint(50, 200)
-        for _ in range(daily_orders):
-            category = np.random.choice(categories)
-            base_amount = {
-                '服装': 150, '美妆': 200, '数码': 800,
-                '家居': 300, '食品': 80, '配饰': 100
-            }[category]
-            
-            amount = base_amount * np.random.uniform(0.5, 2.0)
-            quantity = np.random.randint(1, 5)
-            
-            data.append({
-                'order_date': date,
-                'category': category,
-                'amount': round(amount, 2),
-                'quantity': quantity,
-                'customer_id': f'CUST{np.random.randint(1000, 9999)}',
-                'product_name': f'{category}商品{np.random.randint(1, 50)}'
-            })
-    
-    return pd.DataFrame(data)
-
-# 加载数据
-df = generate_sample_data()
-
-# 计算KPI指标
-def calculate_kpis(df, start_date=None, end_date=None):
-    """计算关键绩效指标"""
-    if start_date and end_date:
-        mask = (df['order_date'] >= start_date) & (df['order_date'] <= end_date)
-        filtered_df = df[mask]
+# 数据加载函数 - 支持CSV导入和模拟数据
+def load_douyin_data(file_path=None):
+    """加载抖音电商数据，支持真实数据导入"""
+    if file_path and os.path.exists(file_path):
+        # 加载真实数据
+        df = pd.read_csv(file_path)
+        # 适配抖音电商数据格式
+        if '订单日期' in df.columns:
+            df['Order Date'] = pd.to_datetime(df['订单日期'])
+            df['Amount'] = df['订单金额']
+            df['Profit'] = df['订单金额'] * 0.2  # 假设利润率20%
+            df['Quantity'] = df['商品数量']
+            df['Category'] = df['商品类目']
+            df['Sub-Category'] = df['商品名称']
+            df['State'] = df['省份']
+            df['CustomerName'] = df['买家昵称']
+            df['PaymentMode'] = df['支付方式']
     else:
-        filtered_df = df
+        # 生成模拟数据（保持与原版一致的结构）
+        np.random.seed(42)
+        n_orders = 5000
+        
+        categories = ['服装', '美妆', '数码', '家居', '食品']
+        states = ['广东', '浙江', '江苏', '山东', '河南', '四川', '湖北', '湖南']
+        payment_modes = ['支付宝', '微信支付', '银行卡', '抖音月付']
+        
+        df = pd.DataFrame({
+            'Order ID': [f'DY{str(i).zfill(6)}' for i in range(n_orders)],
+            'Order Date': pd.date_range('2024-01-01', periods=n_orders, freq='h'),
+            'Amount': np.random.randint(50, 2000, n_orders),
+            'Profit': np.random.randint(10, 400, n_orders),
+            'Quantity': np.random.randint(1, 5, n_orders),
+            'Category': np.random.choice(categories, n_orders),
+            'Sub-Category': [f'商品{i}' for i in range(n_orders)],
+            'State': np.random.choice(states, n_orders),
+            'CustomerName': [f'用户{i}' for i in range(n_orders)],
+            'PaymentMode': np.random.choice(payment_modes, n_orders)
+        })
     
-    total_sales = filtered_df['amount'].sum()
-    total_orders = len(filtered_df)
-    avg_order_value = total_sales / total_orders if total_orders > 0 else 0
-    total_customers = filtered_df['customer_id'].nunique()
+    # 统一数据格式（与原版一致）
+    df['Order Date'] = pd.to_datetime(df['Order Date'])
+    df['Order Month'] = df['Order Date'].dt.strftime('%b')
+    df['Quater'] = df['Order Date'].dt.quarter
     
-    return {
-        'total_sales': total_sales,
-        'total_orders': total_orders,
-        'avg_order_value': avg_order_value,
-        'total_customers': total_customers
-    }
+    return df
 
-# 布局设计
-app.layout = dbc.Container([
-    # 头部
-    dbc.Row([
-        dbc.Col([
-            html.H1("📊 抖音电商销售智能分析", className="text-center my-4"),
-            html.P("实时销售数据分析与可视化平台", className="text-center text-muted")
-        ])
+import os
+
+# 尝试加载数据
+try:
+    # 优先加载用户上传的数据
+    if os.path.exists('data/douyin_orders.csv'):
+        df = load_douyin_data('data/douyin_orders.csv')
+    else:
+        df = load_douyin_data()
+except:
+    df = load_douyin_data()
+
+# 初始化Dash应用
+app = Dash(__name__)
+app.title = "NexusTik 销售智能分析"
+
+def kpi_figure(value, title, prefix=""):
+    """KPI指标卡片（保持原版样式）"""
+    fig = go.Figure(
+        go.Indicator(
+            mode="number",
+            value=value,
+            title={"text": title, "font": {"size": 14}},
+            number={"prefix": prefix, "font": {"size": 28}},
+            domain={"x": [0, 1], "y": [0, 1]}
+        )
+    )
+    fig.update_layout(
+        height=120,
+        margin=dict(l=8, r=8, t=30, b=8),
+        paper_bgcolor="white"
+    )
+    return fig
+
+app.layout = html.Div(children=[
+    html.H1("NexusTik 抖音电商销售分析",
+            style={"textAlign": "center", "color": "#1D37CAD6"}),
+    html.Br(),
+    
+    # 数据上传
+    html.Div([
+        dcc.Upload(
+            id='upload-data',
+            children=html.Div(['拖拽或 ', html.A('选择CSV文件')]),
+            style={
+                'width': '50%',
+                'height': '60px',
+                'lineHeight': '60px',
+                'borderWidth': '1px',
+                'borderStyle': 'dashed',
+                'borderRadius': '5px',
+                'textAlign': 'center',
+                'margin': '10px auto'
+            },
+            multiple=False
+        )
     ]),
     
-    # 筛选器
-    dbc.Row([
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    html.H5("📅 时间筛选", className="card-title"),
-                    dcc.DatePickerRange(
-                        id='date-range',
-                        start_date=df['order_date'].min(),
-                        end_date=df['order_date'].max(),
-                        display_format='YYYY-MM-DD'
-                    )
-                ])
-            ], className="mb-4")
-        ], width=6),
-        
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    html.H5("🏷️ 商品类别", className="card-title"),
-                    dcc.Dropdown(
-                        id='category-filter',
-                        options=[{'label': cat, 'value': cat} for cat in df['category'].unique()],
-                        multi=True,
-                        placeholder="选择商品类别..."
-                    )
-                ])
-            ], className="mb-4")
-        ], width=6)
-    ]),
+    html.Div([
+        "商品类目",
+        dcc.Dropdown(id="input_category",
+                     options=[{'label': '全部', 'value': "all"}] +
+                               [{'label': cat, 'value': cat} for cat in df['Category'].unique()],
+                     value="all",
+                     clearable=False,
+                     style={'textAlign': 'center', 'height': '25px', 'width': '200px', 'margin': '0 auto'})
+    ], style={'textAlign': 'center', 'fontSize': 20}),
+    html.Br(),
     
-    # KPI 卡片
-    dbc.Row([
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    html.H4("💰 总销售额", className="card-title text-center"),
-                    html.H2(id='kpi-sales', className="text-center text-success")
-                ])
-            ], color="dark", inverse=True)
-        ], width=3),
-        
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    html.H4("📦 总订单数", className="card-title text-center"),
-                    html.H2(id='kpi-orders', className="text-center text-info")
-                ])
-            ], color="dark", inverse=True)
-        ], width=3),
-        
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    html.H4("💵 客单价", className="card-title text-center"),
-                    html.H2(id='kpi-aov', className="text-center text-warning")
-                ])
-            ], color="dark", inverse=True)
-        ], width=3),
-        
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    html.H4("👥 客户数", className="card-title text-center"),
-                    html.H2(id='kpi-customers', className="text-center text-primary")
-                ])
-            ], color="dark", inverse=True)
-        ], width=3)
-    ], className="mb-4"),
+    html.Div([
+        "季度: ",
+        dcc.Dropdown(id="input_quater",
+                     options=[{'label': '全年', 'value': 'all'},
+                              {'label': 'Q1 (1-3月)', 'value': 1},
+                              {'label': 'Q2 (4-6月)', 'value': 2},
+                              {'label': 'Q3 (7-9月)', 'value': 3},
+                              {'label': 'Q4 (10-12月)', 'value': 4}],
+                     value='all',
+                     clearable=False,
+                     style={'height': '25px', 'width': '200px', 'margin': '0 auto', 'textAlign': 'center'})
+    ], style={'textAlign': 'center', 'fontSize': 20}),
+    html.Br(), html.Br(),
+    
+    # KPI指标
+    html.Div([
+        dcc.Graph(id='total_revenue',
+                  config={'displayModeBar': False},
+                  style={'width': '24%', 'height': '130px'}),
+        dcc.Graph(id='total_profit',
+                  config={'displayModeBar': False},
+                  style={'width': '24%', 'height': '130px'}),
+        dcc.Graph(id='quantity_sold',
+                  config={'displayModeBar': False},
+                  style={'width': '24%', 'height': '130px'}),
+        dcc.Graph(id='aov',
+                  config={'displayModeBar': False},
+                  style={'width': '24%', 'height': '130px'})
+    ], style={'display': 'flex', 'gap': '4px', "justifyContent": "space-between"}),
+    html.Br(), html.Br(),
     
     # 图表区域
-    dbc.Row([
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    html.H5("📈 销售趋势", className="card-title"),
-                    dcc.Graph(id='sales-trend-chart')
-                ])
-            ])
-        ], width=8),
-        
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    html.H5("🥧 类别占比", className="card-title"),
-                    dcc.Graph(id='category-pie-chart')
-                ])
-            ])
-        ], width=4)
-    ], className="mb-4"),
-    
-    dbc.Row([
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    html.H5("🏆 热销商品 TOP 10", className="card-title"),
-                    dcc.Graph(id='top-products-chart')
-                ])
-            ])
-        ], width=6),
-        
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    html.H5("📊 月度销售对比", className="card-title"),
-                    dcc.Graph(id='monthly-comparison-chart')
-                ])
-            ])
-        ], width=6)
-    ], className="mb-4"),
-    
-    # 数据表格
-    dbc.Row([
-        dbc.Col([
-            dbc.Card([
-                dbc.CardBody([
-                    html.H5("📋 详细数据", className="card-title"),
-                    html.Div(id='data-table')
-                ])
-            ])
-        ])
-    ])
-    
-], fluid=True)
+    html.Div([
+        html.Div(html.Img(id='monthly_profit'), style={'width': '50%'}),
+        html.Div(dcc.Graph(id='sub_category_profit'), style={'width': '50%'})
+    ], style={'display': 'flex'}),
+    html.Div([
+        html.Div(dcc.Graph(id='revenue_states'), style={'width': '50%'}),
+        html.Div(dcc.Graph(id='category_quantity_sold'), style={'width': '50%'})
+    ], style={'display': 'flex'}),
+    html.Div([
+        html.Div(dcc.Graph(id='payment_dist'), style={'width': '50%'}),
+        html.Div(dcc.Graph(id='top_customers'), style={'width': '50%'})
+    ], style={'display': 'flex'})
+], style={'backgroundColor': 'white'})
 
-# 回调函数
-@callback(
-    [Output('kpi-sales', 'children'),
-     Output('kpi-orders', 'children'),
-     Output('kpi-aov', 'children'),
-     Output('kpi-customers', 'children')],
-    [Input('date-range', 'start_date'),
-     Input('date-range', 'end_date'),
-     Input('category-filter', 'value')]
-)
-def update_kpis(start_date, end_date, categories):
-    """更新KPI指标"""
+@app.callback([
+    Output('total_revenue', 'figure'),
+    Output('total_profit', 'figure'),
+    Output('quantity_sold', 'figure'),
+    Output('aov', 'figure'),
+    Output('monthly_profit', 'src'),
+    Output('sub_category_profit', 'figure'),
+    Output('revenue_states', 'figure'),
+    Output('category_quantity_sold', 'figure'),
+    Output('payment_dist', 'figure'),
+    Output('top_customers', 'figure')],
+    Input('input_quater', 'value'),
+    Input('input_category', 'value'))
+
+def get_graph(quater, category):
+    """核心分析逻辑（保持原版算法）"""
     filtered_df = df.copy()
     
-    if start_date and end_date:
-        filtered_df = filtered_df[
-            (filtered_df['order_date'] >= start_date) & 
-            (filtered_df['order_date'] <= end_date)
-        ]
+    if quater != 'all':
+        filtered_df = filtered_df[filtered_df['Quater'] == quater]
+    if category != 'all':
+        filtered_df = filtered_df[filtered_df['Category'] == category]
     
-    if categories:
-        filtered_df = filtered_df[filtered_df['category'].isin(categories)]
+    # Total revenue
+    total_revenue = filtered_df['Amount'].sum()
+    fig1 = kpi_figure(total_revenue, "总销售额", "¥")
     
-    kpis = calculate_kpis(filtered_df)
+    # Total Profit
+    total_profit = filtered_df['Profit'].sum()
+    fig2 = kpi_figure(total_profit, "总利润", "¥")
     
-    return (
-        f"¥{kpis['total_sales']:,.2f}",
-        f"{kpis['total_orders']:,}",
-        f"¥{kpis['avg_order_value']:.2f}",
-        f"{kpis['total_customers']:,}"
-    )
-
-@callback(
-    Output('sales-trend-chart', 'figure'),
-    [Input('date-range', 'start_date'),
-     Input('date-range', 'end_date'),
-     Input('category-filter', 'value')]
-)
-def update_sales_trend(start_date, end_date, categories):
-    """更新销售趋势图"""
-    filtered_df = df.copy()
+    # Quantity Sold
+    quantity_sold = filtered_df['Quantity'].sum()
+    fig3 = kpi_figure(quantity_sold, "销售数量")
     
-    if start_date and end_date:
-        filtered_df = filtered_df[
-            (filtered_df['order_date'] >= start_date) & 
-            (filtered_df['order_date'] <= end_date)
-        ]
+    # Average Order value
+    aov = filtered_df['Amount'].sum() / filtered_df['Quantity'].sum() if filtered_df['Quantity'].sum() > 0 else 0
+    fig4 = kpi_figure(aov, "客单价", "¥")
     
-    if categories:
-        filtered_df = filtered_df[filtered_df['category'].isin(categories)]
+    # Monthly Profit
+    df_month_profit = filtered_df.groupby("Order Month")['Profit'].sum().reset_index()
+    df_month_profit['Month_No'] = pd.to_datetime(df_month_profit['Order Month'], format='%b').dt.month
+    df_month_profit.sort_values('Month_No', inplace=True)
+    df_month_profit.drop("Month_No", axis=1, inplace=True)
     
-    daily_sales = filtered_df.groupby('order_date')['amount'].sum().reset_index()
+    plt.figure(figsize=(7.5, 5))
+    sns.set_theme(style='ticks')
+    bar_color = ["green" if profit >= 0 else "red" for profit in df_month_profit['Profit']]
+    sns.barplot(data=df_month_profit, x='Order Month', y="Profit", edgecolor='black', palette=bar_color)
+    plt.gca().yaxis.set_major_formatter(plt.FuncFormatter(lambda y, pos: f"¥{int(y/1000)}K"))
+    plt.title("月度利润", fontsize=15)
+    plt.ylabel("利润")
+    plt.xlabel("")
+    sns.despine()
     
-    fig = px.line(
-        daily_sales, 
-        x='order_date', 
-        y='amount',
-        title='日销售额趋势',
-        labels={'order_date': '日期', 'amount': '销售额 (¥)'}
-    )
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png', bbox_inches='tight')
+    plt.close()
+    buf.seek(0)
+    encoded = base64.b64encode(buf.read()).decode('utf-8')
+    fig5 = f"data:image/png;base64,{encoded}"
     
-    fig.update_layout(
-        template='plotly_dark',
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)'
-    )
+    # Profit by Sub-category
+    df_sub_category_profit = filtered_df.groupby(['Sub-Category'])['Profit'].sum().sort_values(ascending=False).head().reset_index()
+    fig6 = px.bar(data_frame=df_sub_category_profit[::-1], x="Profit", y="Sub-Category", template="plotly_white")
+    fig6.update_layout(title="商品利润排行", title_x=0.5, xaxis_title="", yaxis_title="")
+    fig6.update_traces(marker={'line': {'width': 1, 'color': 'black'}},
+                       text=[f"¥{x:,}" for x in df_sub_category_profit['Profit'][::-1]],
+                       textposition='inside')
+    fig6.update_xaxes(showticklabels=False)
     
-    return fig
-
-@callback(
-    Output('category-pie-chart', 'figure'),
-    [Input('date-range', 'start_date'),
-     Input('date-range', 'end_date')]
-)
-def update_category_pie(start_date, end_date):
-    """更新类别饼图"""
-    filtered_df = df.copy()
+    # Category Quantity
+    df_category_quantity = filtered_df.groupby('Category')['Quantity'].sum().reset_index()
+    fig7 = px.pie(data_frame=df_category_quantity, values='Quantity', names='Category', template='plotly_white')
+    fig7.update_layout(title="类目销量分布", title_x=0.5, showlegend=True)
     
-    if start_date and end_date:
-        filtered_df = filtered_df[
-            (filtered_df['order_date'] >= start_date) & 
-            (filtered_df['order_date'] <= end_date)
-        ]
+    # Top Revenue States
+    df_top_revenue_states = filtered_df.groupby('State')['Amount'].sum().sort_values(ascending=False).head().reset_index()
+    df_top_revenue_states['Percent'] = df_top_revenue_states['Amount'] / df["Amount"].sum() * 100
+    fig8 = px.bar(data_frame=df_top_revenue_states.iloc[::-1], x='Percent', y='State', template='plotly_white')
+    fig8.update_layout(title="销售额省份排行", title_x=0.5, xaxis_title="", yaxis_title="")
+    fig8.update_traces(marker={'line': {'width': 1, 'color': 'black'}},
+                       text=[f"{x:.1f}%" for x in df_top_revenue_states['Percent'][::-1]],
+                       textposition='inside')
+    fig8.update_xaxes(showticklabels=False)
     
-    category_sales = filtered_df.groupby('category')['amount'].sum().reset_index()
+    # Payment Mode Distribution
+    df_payment_mode = df["PaymentMode"].value_counts().reset_index()
+    fig9 = px.pie(data_frame=df_payment_mode, values='count', names='PaymentMode', template='plotly_white')
+    fig9.update_layout(title="支付方式分布", title_x=0.5, showlegend=True)
     
-    fig = px.pie(
-        category_sales,
-        values='amount',
-        names='category',
-        title='商品类别销售占比'
-    )
+    # Top 5 Customers
+    df_top_customers = filtered_df.groupby("CustomerName")['Amount'].sum().sort_values(ascending=False).head().reset_index()
+    fig10 = px.bar(data_frame=df_top_customers, x='CustomerName', y='Amount', template="plotly_white")
+    fig10.update_layout(title="TOP5客户", title_x=0.5, xaxis_title="", yaxis_title="")
+    fig10.update_traces(marker={'line': {'width': 1, 'color': 'black'}},
+                        text=[f"¥{x/1000:.1f}K" for x in df_top_customers['Amount']],
+                        textposition='outside')
+    fig10.update_yaxes(showticklabels=False)
     
-    fig.update_layout(
-        template='plotly_dark',
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)'
-    )
-    
-    return fig
-
-@callback(
-    Output('top-products-chart', 'figure'),
-    [Input('date-range', 'start_date'),
-     Input('date-range', 'end_date'),
-     Input('category-filter', 'value')]
-)
-def update_top_products(start_date, end_date, categories):
-    """更新热销商品图"""
-    filtered_df = df.copy()
-    
-    if start_date and end_date:
-        filtered_df = filtered_df[
-            (filtered_df['order_date'] >= start_date) & 
-            (filtered_df['order_date'] <= end_date)
-        ]
-    
-    if categories:
-        filtered_df = filtered_df[filtered_df['category'].isin(categories)]
-    
-    product_sales = filtered_df.groupby('product_name')['amount'].sum().reset_index()
-    product_sales = product_sales.nlargest(10, 'amount')
-    
-    fig = px.bar(
-        product_sales,
-        x='amount',
-        y='product_name',
-        orientation='h',
-        title='热销商品 TOP 10',
-        labels={'amount': '销售额 (¥)', 'product_name': '商品名称'}
-    )
-    
-    fig.update_layout(
-        template='plotly_dark',
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)'
-    )
-    
-    return fig
-
-@callback(
-    Output('monthly-comparison-chart', 'figure'),
-    [Input('category-filter', 'value')]
-)
-def update_monthly_comparison(categories):
-    """更新月度对比图"""
-    filtered_df = df.copy()
-    
-    if categories:
-        filtered_df = filtered_df[filtered_df['category'].isin(categories)]
-    
-    filtered_df['month'] = filtered_df['order_date'].dt.to_period('M')
-    monthly_sales = filtered_df.groupby('month')['amount'].sum().reset_index()
-    monthly_sales['month'] = monthly_sales['month'].astype(str)
-    
-    fig = px.bar(
-        monthly_sales,
-        x='month',
-        y='amount',
-        title='月度销售对比',
-        labels={'month': '月份', 'amount': '销售额 (¥)'}
-    )
-    
-    fig.update_layout(
-        template='plotly_dark',
-        plot_bgcolor='rgba(0,0,0,0)',
-        paper_bgcolor='rgba(0,0,0,0)'
-    )
-    
-    return fig
+    return [fig1, fig2, fig3, fig4, fig5, fig6, fig7, fig8, fig9, fig10]
 
 if __name__ == '__main__':
-    print("🚀 启动销售智能分析看板...")
+    print("🚀 NexusTik 销售智能分析启动...")
     print("📊 访问地址: http://localhost:8050")
-    app.run_server(debug=True, host='0.0.0.0', port=8050)
+    app.run(debug=True, host='0.0.0.0', port=8050)
